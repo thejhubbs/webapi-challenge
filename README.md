@@ -25,14 +25,20 @@ In this challenge, create a web API around the following resources: `Projects` a
 Demonstrate your understanding of this Sprint's concepts by answering the following free-form questions. Edit this document to include your answers after each question. Make sure to leave a blank line above and below your answer so it is clear and easy to read by your project manager.
 
 - [ ] Mention two parts of Express that you learned about this week.
+  -The req, res, next flow of backend and the concept of passing along a request and returning one
+  -Importance of status codes and how easily express makes it to return appropriate info
 
 - [ ] Describe Middleware?
+  Loosely, middleware is the "middle" steps in your code after receiving a req and before sending the res (although it can send res through errors and other means)
 
 - [ ] Describe a Resource?
+  A resource is a "object", "class", or "record" that has a set and defined amount of fields, usually stored in a database. Common
 
 - [ ] What can the API return to help clients know if a request was successful?
+  An http res that has a status code (200) and a body of information, in our case JSON objects or arrays of objects
 
 - [ ] How can we partition our application into sub-applications?
+  Through use of routers to make individual CRUD operations per resource
 
 ## Project Setup
 
