@@ -4,6 +4,7 @@ const projectDb = require('./data/helpers/projectModel.js');
 const router = express.Router();
 // -/api/projects/actions
 
+//Middleware to get the project and store it on req
 async function getProject(req, res, next) {
   try {
     const project = await projectDb.get(req.params.projectId)
@@ -18,7 +19,7 @@ async function getProject(req, res, next) {
 
 // | POST   | -/api/projects/actions
 //| Creates a action using the information sent inside the `request body`.
-router.post('/:projectId', validateaction, async (req, res) => {
+router.post('/', validateAction, async (req, res) => {
   try {
       const action = await actionDb.insert(req.body)
       res.send(action)
@@ -32,7 +33,6 @@ router.post('/:projectId', validateaction, async (req, res) => {
 // | GET    | -/api/projects/actions
 //| Returns an array of all the action objects contained in the database.                                                                                                         |
 router.get('/:projectId', getProject, async (req, res) => {
-  console.log(req.project)
   try {
     const actions = await projectDb.getProjectActions(req.params.projectId)
     res.json(actions)
@@ -45,9 +45,9 @@ router.get('/:projectId', getProject, async (req, res) => {
 
 // | GET    | -/api/projects/actions/:id
 //| Returns the action object with the specified id.                                                                                                                              |
-router.get('/:projectId/:id', validateactionId, async (req, res) => {
+router.get(':id', validateActionId, async (req, res) => {
   try {
-    const action = await actionDb.getById(req.params.id)
+    const action = await actionDb.get(req.params.id)
     res.json(action)
   } catch {
     res.status(500).json({
@@ -58,7 +58,7 @@ router.get('/:projectId/:id', validateactionId, async (req, res) => {
 
 // | DELETE | -/api/projects/actions/:id
 //| Removes the action with the specified id and returns the **deleted action object**. You may need to make additional calls to the database in order to satisfy this requirement. |
-router.delete('/:id', validateactionId, async (req, res) => {
+router.delete('/:id', validateActionId, async (req, res) => {
   try {
     const action = await actionDb.remove(req.params.id)
     res.send("Deleted")
@@ -71,7 +71,7 @@ router.delete('/:id', validateactionId, async (req, res) => {
 
 // | PUT    | -/api/projects/actions/:id
 //| Updates the action with the specified `id` using data from the `request body`. Returns the modified document, **NOT the original**.                                           |
-router.put('/:id', validateactionId, async (req, res) => {
+router.put('/:id', validateActionId, async (req, res) => {
   try {
     const action = await actionDb.update(req.params.id, req.body)
     res.json(action)
@@ -82,11 +82,11 @@ router.put('/:id', validateactionId, async (req, res) => {
   }
 })
 
-//   - `validateactionId` validates the action id on every request that expects a action id parameter
-async function validateactionId(req, res, next) {
+//   - `validateActionId` validates the action id on every request that expects a action id parameter
+async function validateActionId(req, res, next) {
   try{
     const { id } = req.params;
-    const action = await actionDb.getById(id)
+    const action = await actionDb.get(id)
     if(action) {
       //   - if the `id` parameter is valid, store that action object as `req.action`
       req.action = action;
@@ -103,14 +103,13 @@ async function validateactionId(req, res, next) {
 };
 
 
-//   - `validateaction` validates the `body` on a request to create a new action
-function validateaction(req, res, next) {
+//   - `validateAction` validates the `body` on a request to create a new action
+function validateAction(req, res, next) {
   if(req.body){
-    if(req.body.name) {
+    if(req.body.description && req.body.notes && req.body.project_id) {
       next();
     }else {
-      //   - if the request `body` is missing the required `name` field, cancel the request and respond with status `400` and `{ message: "missing required name field" }`
-      res.status(400).json({ message: "missing required name field" })
+      res.status(400).json({ message: "missing required fields" })
     }
   }
   else{
